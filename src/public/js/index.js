@@ -1,68 +1,133 @@
 const socket = io();
-const productList = document.getElementById('productList');
 
+console.log('Conectado al servidor');
 
-const srvResponse = document.getElementById("srvResponse");
-const btnAddProduct = document.getElementById("btnAddProduct");
-const btnDeleteProduct = document.getElementById("btnDeleteProduct");
+socket.on('products', (products) => {
+    const $container = document.getElementById('productList');
 
-socket.on("products", (data) => {
-  let html = `<table class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">Id</th>
-                  <th scope="col">Title</th>
-                  <th scope="col">Image</th>
-                  <th scope="col">Description</th>
-                  <th scope="col">Price</th>
-                </tr>
-              </thead>
-              <tbody id="products">`;
+    $container.innerHTML = '';
 
-  data.forEach((prod) => {
-    html += `<tr>
-              <td>${prod._id}</td>
-              <td>${prod.title}</td>
-              <td><img src="${prod.thumbnails}" alt="" width="100px" /></td>
-              <td>${prod.description}</td>
-              <td>$ ${prod.price}</td>
-            </tr>`;
-  });
-  html += `</tbody></table>`;
-  srvResponse.innerHTML = html;
+    products.forEach(product => {
+        const div = document.createElement('div');
+        div.innerHTML += `
+            <h4>${product.title}</h4>
+            <p>${product.description}</p>
+            <p>Price: $${product.price}</p>
+            <p>Code: ${product.code}</p>
+            <img src="${product.thumbnails}" alt="${product.title}" />
+        `;
+
+        $container.appendChild(div);
+    });
 });
 
-const addProduct = () => {
-  const title = document.getElementById("title").value;
-  const description = document.getElementById("description").value;
-  const price = document.getElementById("price").value;
-  const code = document.getElementById("code").value;
-  const thumbnails = document.getElementById("thumbnails").value;
-  const product = {
-    title: title,
-    description: description,
-    price: price,
-    code: code,
-    thumbnails: [thumbnails],
-  };
-  socket.emit("newProduct", product);
-  // Limpio los campos
-  document.getElementById("title").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("code").value = "";
-  document.getElementById("thumbnails").value = "";
-};
+const form = document.getElementById('formAdd');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const target = e.target;
+    const formData = new FormData(form);
 
-btnAddProduct.onclick = addProduct;
+    const newProduct = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        price: +formData.get('price'),
+        code: formData.get('code'),
+        thumbnails: formData.get('thumbnails'), // Este campo ahora contiene el archivo
+    };
 
-const deleteProduct = () => {
-  const idProduct = document.getElementById("inputDeleteId").value;
-  socket.emit("deleteProduct", idProduct);
-  document.getElementById("inputDeleteId").value = "";
-};
+    socket.emit('addProduct', newProduct);
 
-btnDeleteProduct.onclick = deleteProduct;
+    target.title.value = '';
+    target.description.value = '';
+    target.price.value = '';
+    target.code.value = '';
+    target.thumbnails.value = ''; // Limpia el campo de archivo
+    
+    const serverResponse = document.getElementById('srvResponse');
+    serverResponse.innerHTML = 'Product added successfully!';
+});
+
+
+
+
+// const productList = document.getElementById('productList');
+// const socket = io();
+
+
+// document.addEventListener('DOMContentLoaded', () => {
+//   // Conectarse al servidor de Socket.IO
+
+//   // Obtener referencias a los elementos del formulario
+//   const titleInput = document.getElementById('title');
+//   const descriptionInput = document.getElementById('description');
+//   const priceInput = document.getElementById('price');
+//   const codeInput = document.getElementById('code');
+//   const thumbnailsInput = document.getElementById('thumbnails');
+//   const addProductButton = document.getElementById('btnAddProduct');
+//   const serverResponse = document.getElementById('srvResponse');
+
+//   // Agregar un evento de clic al botón "Add Product"
+//   addProductButton.addEventListener('click', () => {
+//     // Obtener los valores de los campos del formulario
+//     const title = titleInput.value;
+//     const description = descriptionInput.value;
+//     const price = priceInput.value;
+//     const code = codeInput.value;
+//     const thumbnails = thumbnailsInput.value;
+
+//     // Validar que todos los campos estén completos (puedes agregar más validaciones)
+//     if (!title || !description || !price || !code) {
+//       serverResponse.innerHTML = 'Please fill in all fields';
+//       return;
+//     }
+
+//     // Crear un objeto con los datos del producto
+//     const newProduct = {
+//       title,
+//       description,
+//       price,
+//       code,
+//       thumbnails,
+//     };
+
+//     // Enviar el objeto al servidor a través de Socket.IO
+//     socket.emit('addProduct', newProduct);
+
+//     // Limpiar los campos del formulario después de enviarlos
+//     titleInput.value = '';
+//     descriptionInput.value = '';
+//     priceInput.value = '';
+//     codeInput.value = '';
+//     thumbnailsInput.value = '';
+
+//     serverResponse.innerHTML = 'Product added successfully!';
+//   });
+
+//   // Escuchar eventos del servidor (puedes agregar más eventos según tus necesidades)
+//   socket.on('productAdded', (message) => {
+//     console.log('Server says:', message);
+//   });
+
+//   // Escucha eventos para actualizar la lista de productos en tiempo real
+//   socket.on('updateProductList', (products) => {
+//     // Borra la lista actual de productos
+//     productList.innerHTML = '';
+
+//     // Agrega los productos actualizados a la lista
+//     products.forEach((product) => {
+//       const productItem = document.createElement('div');
+//       productItem.className = 'product-item';
+//       productItem.innerHTML = `
+//         <h4>${product.title}</h4>
+//         <p>${product.description}</p>
+//         <p>Price: $${product.price}</p>
+//         <p>Code: ${product.code}</p>
+//         <img src="${product.thumbnails}" alt="${product.title}" />
+//       `;
+//       productList.appendChild(productItem);
+//     });
+//   });
+// });
 
 
 // socket.on('productsUpdate', () => {

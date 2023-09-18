@@ -21,26 +21,26 @@ export default class Carts {
   }
 }
 
-  addProductToCart = async (idCart, idProduct) => {
+  addProductToCart = async (cid, pid) => {
     try {
-      const product = await productsModel.findOne({_id: idProduct})
-      const cart = await cartsModel.findOne({_id: idCart})
+      const product = await productsModel.findOne({_id: pid})
+      const cart = await cartsModel.findOne({_id: cid})
   
       cart.products.push(product.title)
       /* product.carts.push(cart.title) */
   
   
-      await productsModel.updateOne({_id: idProduct}, product)
-      await cartsModel.updateOne({_id: idCart}, cart)
+      await productsModel.updateOne({_id: pid}, product)
+      await cartsModel.updateOne({_id: cid}, cart)
       return
     } catch (error) {
       throw error
     }
   }
 
-  async getCartById(id) {
-    if (this.validateId(id)) {
-      return (await cartModel.findOne({ _id: id }).lean()) || null;
+  async getCartById(cid) {
+    if (this.validateId(cid)) {
+      return (await cartModel.findOne({ _id: cid }).lean()) || null;
     } else {
       console.log("Not found!");
       return null;

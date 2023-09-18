@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Carts from "../dao/managers/carts.js"
+import Carts from "../dao/managersMongo/CartManager.js"
 
 const router = Router();
 const cartsManager = new Carts()
@@ -20,11 +20,23 @@ router.post("/", async(req, res) => {
 
 })
 
-router.put("/:idCart/:idProduct", async(req, res) => {
+router.put("/:cid/:pid", async(req, res) => {
     try {
-        const {idCart, idProduct} = req.params
-        const result = await cartsManager.addProductToCart(idCart, idProduct)
-        res.send({status:"success", payload: "Se cargo el producto al carrito"})
+        const {cid, pid} = req.params
+        const result = await cartsManager.addProductToCart(cid, pid)
+        res.send({status:"success", payload: result})
+    } catch (error) {
+        res.status(500).send({status:"error", error})
+    }
+
+})
+
+router.put("/:cid/product/:pid", async(req, res) => {
+    const {cid, pid} = req.params
+    const newQuantity = req.body.quantity
+    try {
+        const cart = await cartsManager.addProductToCart(cid, pid, newQuantity)
+        res.send({status:"success", payload: cart})
     } catch (error) {
         res.status(500).send({status:"error", error})
     }
