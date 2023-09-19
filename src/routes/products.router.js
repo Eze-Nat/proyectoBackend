@@ -8,11 +8,28 @@ import { uploader } from "../utils.js";
 const router = Router();
 const productsManager = new Products();
 
-// Ruta para obtener todos los productos
-router.get("/", async (req, res) => {
-    const products = await productsManager.getAll();
-    res.send({ status: "success", payload: products });
+
+router.get("/", async(req,res)=>{
+    try {
+        const limit = req.query.limit;
+        const products = await productsManager.getProducts();
+        if(limit){
+            //devolver productos de acuerdo al limite
+        } else {
+            res.json({status:"success", data:products});
+        }
+    } catch (error) {
+        res.json({status:"error", message:error.message});
+    }
 });
+
+
+
+// // Ruta para obtener todos los productos
+// router.get("/", async (req, res) => {
+//     const products = await productsManager.getAll();
+//     res.send({ status: "success", payload: products });
+// });
 
 // Ruta para agregar un producto
 router.post("/", uploader.single("thumbnails"), async (req, res) => {

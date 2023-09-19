@@ -24,47 +24,60 @@ export default class Products {
   }
   //#Read
   async getProducts(limit) {
-    return await limit ? productsModel.find().limit(limit).lean(): productsModel.find().lean();//lean() devuelve un objeto literal de JS y no un objeto de mongoose
+    try {
+      const products = await productsModel.find().lean();
+      return products;
+  } catch (error) {
+      throw error;
+  }
+    // return await limit ? productsModel.find().limit(limit).lean(): productsModel.find().lean();//lean() devuelve un objeto literal de JS y no un objeto de mongoose
   }
 
-  async getAll(query) {
+  async getAll() {
     try {
-      const limit = query.limit || 10
-      const page = query.page || 1
-      let categoryQuery = {}
-      let stockQuery = {}
-      const sortOptions = {}
+      // const limit = query.limit || 10
+      // const page = query.page || 1
+      // let categoryQuery = {}
+      // let stockQuery = {}
+      // const sortOptions = {}
 
-      if(query.category){categoryQuery = {category: query.category}}
-      if(query.stock) {stockQuery = {$and: [{stock: {$exists: true}}, {stock: {$ne:0}}]}}
-      if (query.sort === "asc") {
-        sortOptions.price = 1
-      }else if (query.sort === "desc"){
-        sortOptions.price = -1
-      }
-
-      const result = await productsModel.paginate({...categoryQuery, ...stockQuery}, {limit, page, sort: sortOptions})
-      return result
-      // const products = await productsModel.find();  
-      // if (!products || products.length === 0) {
-      //   console.log("No products found in the database.");
-      //   return []; // Devuelve un arreglo vacío si no hay productos
+      // if(query.category){categoryQuery = {category: query.category}}
+      // if(query.stock) {stockQuery = {$and: [{stock: {$exists: true}}, {stock: {$ne:0}}]}}
+      // if (query.sort === "asc") {
+      //   sortOptions.price = 1
+      // }else if (query.sort === "desc"){
+      //   sortOptions.price = -1
       // }
+
+      // const result = await productsModel.paginate({...categoryQuery, ...stockQuery}, {limit, page, sort: sortOptions})
+      // return result
+      const products = await productsModel.find();  
+      if (!products || products.length === 0) {
+        console.log("No products found in the database.");
+        return []; // Devuelve un arreglo vacío si no hay productos
+      }
   
-      // return products.map(product => {
-      //   if (product instanceof mongoose.Document) {
-      //     return product.toObject();
-      //   } else {
-      //     return product;
-      //   }
-      // });
+      return products.map(product => {
+        if (product instanceof mongoose.Document) {
+          return product.toObject();
+        } else {
+          return product;
+        }
+      });
     } catch (error) {
       console.error("Error al obtener productos:", error);
       throw error;
     }
   }
   
-  
+  async getWithPaginate(query, options){
+    try {
+        const result = await this.model.paginate(query, options);
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
   
 
   saveProduct = async (product, thumbnailRoute) => {
