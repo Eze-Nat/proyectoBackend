@@ -64,7 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const codeInput = document.getElementById('code');
     const thumbnailsInput = document.getElementById('thumbnails');
     const addProductButton = document.getElementById('btnAddProduct');
+    const deleteProductButton = document.getElementById('btnDeleteProduct');
     const serverResponse = document.getElementById('srvResponse');
+    const idInput = document.getElementById('inputDeleteId');
+
+    
 
     // Agregar un evento de clic al botón "Add Product"
     addProductButton.addEventListener('click', () => {
@@ -102,6 +106,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         serverResponse.innerHTML = 'Product added successfully!';
     });
+
+    // Agregar un evento de clic al botón "Add Product"
+    deleteProductButton.addEventListener('click', () => {
+        // Obtener los valores de los campos del formulario
+        const id = idInput.value;
+
+        // Validar que todos los campos estén completos (puedes agregar más validaciones)
+        if (!id) {
+            serverResponse.innerHTML = 'Please fill in all fields';
+            return;
+        }
+
+        // Buscar si el ID existe sino le digo --> Lo hace en el manager?? Donde va el error?
+
+
+        // Enviar el objeto al servidor a través de Socket.IO
+        //socket.emit('deleteProduct', id);
+        console.log(socket.emit('deleteProduct', id));
+
+        // Limpiar los campos del formulario después de enviarlos
+        idInput.value = '';
+
+        serverResponse.innerHTML = 'Product deleted successfully!';
+    });
+
+        // Escuchar eventos del servidor para manejar la respuesta de eliminación de producto
+    socket.on('deleteProduct', (message) => {
+        console.log('Server says:', message);
+    });
+
 
     // Escuchar eventos del servidor (puedes agregar más eventos según tus necesidades)
     socket.on('productAdded', (message) => {
@@ -156,3 +190,8 @@ function getProductListFromServer() {
 // Llamada inicial para obtener la lista de productos y renderizarla
 getProductListFromServer();
 
+
+// Escuchar eventos del servidor para manejar la respuesta de eliminación de producto
+socket.on('productDeleted', (message) => {
+    console.log('Server says:', message);
+});

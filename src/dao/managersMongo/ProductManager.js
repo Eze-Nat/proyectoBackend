@@ -72,7 +72,7 @@ export default class Products {
   
   async getWithPaginate(query, options){
     try {
-        const result = await productsModel.paginate(query, options);
+        const result = await this.model.paginate(query, options);
         return result;
     } catch (error) {
         throw error;
@@ -123,11 +123,12 @@ export default class Products {
 
 
   async deleteProduct(pid) {
+    console.log(pid);
     try {
       if (this.validateId(pid)) {
         if (await this.getProductById(pid)) {
           await productsModel.deleteOne({ _id: pid });
-          console.log(`Product id: ${id} has been deleted`);
+          console.log(`Product id: ${pid} has been deleted`);
 
           return true;
         } else {
@@ -143,7 +144,6 @@ export default class Products {
       return false;
     }
   }
-
 
   async validateCode(code) {
     return (await productsModel.findOne({ code: code })) || false;
