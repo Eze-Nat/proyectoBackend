@@ -2,10 +2,10 @@
 
 <p style="color:red"><strong>{{error}}</strong></p>
 
-{{#if products}}
+{{#if payload}}
     <h1>Listado de Productos</h1>
     <ul>
-    {{#each products}}
+    {{#each payload}}
         <li>Nombre: {{this.title}}  Precio: {{this.price}}</li>
         <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
     {{/each}}
@@ -24,5 +24,5 @@
     <h2>No hay productos</h2>
 {{/if}}
 
+<script src="/socket.io/socket.io.js"></script>
 
-<script src="/static/js/index.js"></script>
